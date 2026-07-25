@@ -1,0 +1,17 @@
+## Traefik static configuration
+##
+## Dynamic routing is declared with Docker labels in docker-compose.yml.
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  docker:
+    exposedByDefault: false
+
+api:
+  dashboard: false
+
+log:
+  level: INFO

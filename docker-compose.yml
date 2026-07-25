@@ -1,0 +1,180 @@
+# =============================================================================
+# MerlAIn - local stack
+#
+#   docker compose up -d                                  core services
+#   docker compose --profile storage up -d                + MinIO
+#   docker compose --profile llm up -d                    + Ollama
+#   docker compose --profile imagegen up -d               + ComfyUI
+# =============================================================================
+name: merlain
+
+services:
+  # --- Edge ------------------------------------------------------------------
+  traefik:
+    image: traefik:v3.3
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks: [merlain]
+
+  # --- Application -----------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    depends_on: [api]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.rule=PathPrefix(`/`)
+      - traefik.http.routers.web.priority=1
+      - traefik.http.services.web.loadbalancer.server.port=8080
+    networks: [merlain]
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__Postgres: Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Redis: ${REDIS_CONNECTION}
+      # Identity. MerlAIn issues its own session tokens; the OIDC block is optional and
+      # points at an identity provider you already run. Empty Authority disables it.
+      Auth__Jwt__SigningKey: ${AUTH_JWT_SIGNING_KEY}
+      Auth__Jwt__Issuer: ${AUTH_JWT_ISSUER}
+      Auth__LocalAccounts__Enabled: ${AUTH_LOCAL_ACCOUNTS_ENABLED}
+      Auth__LocalAccounts__AllowRegistration: ${AUTH_ALLOW_REGISTRATION}
+      Auth__Oidc__Authority: ${OIDC_AUTHORITY}
+      Auth__Oidc__MetadataAddress: ${OIDC_METADATA_ADDRESS}
+      Auth__Oidc__ClientId: ${OIDC_CLIENT_ID}
+      Auth__Oidc__ClientSecret: ${OIDC_CLIENT_SECRET}
+      Auth__Oidc__Audience: ${OIDC_AUDIENCE}
+      Auth__Oidc__Scopes: ${OIDC_SCOPES}
+      Auth__Oidc__DisplayName: ${OIDC_DISPLAY_NAME}
+      Auth__Oidc__LinkByVerifiedEmail: ${OIDC_LINK_BY_VERIFIED_EMAIL}
+      Storage__Endpoint: ${S3_ENDPOINT}
+      Storage__AccessKey: ${S3_ACCESS_KEY}
+      Storage__SecretKey: ${S3_SECRET_KEY}
+      Storage__Bucket: ${S3_BUCKET}
+      Storage__ForcePathStyle: ${S3_FORCE_PATH_STYLE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/hubs`)
+      - traefik.http.routers.api.priority=10
+      - traefik.http.services.api.loadbalancer.server.port=8080
+    networks: [merlain]
+
+  agents:
+    build:
+      context: .
+      dockerfile: apps/agents/Dockerfile
+    environment:
+      DOTNET_ENVIRONMENT: Production
+      ConnectionStrings__Postgres: Host=${POSTGRES_HOST};Port=${POSTGRES_PORT};Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Redis: ${REDIS_CONNECTION}
+      Llm__Provider: ${LLM_PROVIDER}
+      Llm__Endpoint: ${LLM_ENDPOINT}
+      Llm__Model: ${LLM_MODEL}
+      Llm__ApiKey: ${LLM_API_KEY}
+      Image__Endpoint: ${IMAGE_ENDPOINT}
+      Image__ApiKey: ${IMAGE_API_KEY}
+      Image__Model: ${IMAGE_MODEL}
+      Mcp__ApiBaseUrl: http://api:8080
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [merlain]
+
+  # --- State -----------------------------------------------------------------
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [merlain]
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [merlain]
+
+  # --- Optional: object storage ----------------------------------------------
+  minio:
+    profiles: [storage]
+    image: minio/minio:latest
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [merlain]
+
+  # --- Optional: local LLM inference -----------------------------------------
+  ollama:
+    profiles: [llm]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks: [merlain]
+
+  # --- Optional: local image generation ---------------------------------------
+  comfyui:
+    profiles: [imagegen]
+    image: ghcr.io/lecode-official/comfyui-docker:latest
+    volumes:
+      - comfyui-data:/opt/comfyui
+    ports:
+      - "8188:8188"
+    networks: [merlain]
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:
+  ollama-data:
+  comfyui-data:
+
+networks:
+  merlain:
+    # Explicit name (instead of the derived "merlain_merlain") so the dev container
+    # can attach to a predictable network and resolve services by their name.
+    name: merlain
+    driver: bridge

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>MerlAIn.Shared</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    The module contract exposes ASP.NET Core routing types (IEndpointRouteBuilder),
+    so the shared library targets the ASP.NET Core shared framework. No NuGet
+    packages are referenced yet: provider SDKs arrive with their phases.
+  -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>

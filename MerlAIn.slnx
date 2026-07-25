@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/apps/">
+    <Project Path="apps/api/MerlAIn.Api.csproj" />
+    <Project Path="apps/agents/MerlAIn.Agents.csproj" />
+  </Folder>
+  <Folder Name="/libs/">
+    <Project Path="libs/dotnet/MerlAIn.Shared/MerlAIn.Shared.csproj" />
+  </Folder>
+</Solution>

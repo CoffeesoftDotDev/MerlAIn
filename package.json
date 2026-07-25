@@ -1,0 +1,18 @@
+{
+  "name": "merlain",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted AI platform for Dungeon Masters",
+  "workspaces": [
+    "apps/web",
+    "libs/web/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace @merlain/web",
+    "build": "npm run build --workspace @merlain/web",
+    "preview": "npm run preview --workspace @merlain/web"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
