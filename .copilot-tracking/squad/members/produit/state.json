@@ -1,10 +1,13 @@
 {
   "schemaVersion":"1.4",
-  "updated":"2026-09-28T17:44:45.882+02:00",
-  "turn":8,
+  "updated":"2026-09-28T19:18:12+02:00",
+  "turn":14,
   "mode":"interactive",
   "activeRoles":[
-    "scribe"
+    "analyst",
+    "tester",
+    "scribe",
+    "produit"
   ],
   "openEscalations":[
   ],
@@ -12,8 +15,8 @@
     "sessionModel":"gpt-6-astra",
     "modelOverrides":{
     },
-    "estCostUsd":5.6833,
-    "estCreditsTotal":568.33,
+    "estCostUsd":9.8756,
+    "estCreditsTotal":987.56,
     "costPreflight":{
       "runId":"5506a807-54b9-4668-ae51-2d91e379d22c",
       "roundId":"",

@@ -1,0 +1,60 @@
+{
+  "prdFile": ".copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md",
+  "lastAccessed": "2026-09-28T19:14:39.457+02:00",
+  "currentPhase": "integrate",
+  "status": "draft",
+  "authoringStatus": "complete",
+  "reviewStatus": "completed",
+  "approvalStatus": "not-approved",
+  "disclaimerShownAt": "2026-09-28T18:11:45+02:00",
+  "phaseSkillsLoaded": [
+    "prd-author#assess",
+    "prd-author#create",
+    "prd-author#build",
+    "prd-author#integrate"
+  ],
+  "questionsAsked": [],
+  "answeredQuestions": {
+    "product-name": "MerlAIn — PRD principal V1",
+    "scope": "Décisions utilisateur consolidées du 28 septembre 2026 ; rédaction uniquement, sans questionnaire.",
+    "source-precedence": "Demande actuelle avant recherche, plan et projection d'intake ; mémoire v0.1.1 conservée."
+  },
+  "referencesProcessed": [
+    {
+      "file": ".copilot-tracking/squad/members/produit/research/2026-09-28/merlain-specifications-research.md",
+      "status": "integrated",
+      "keyFindings": "Scaffold distinct de la cible ; questions anciennes supplantées par les décisions actuelles."
+    },
+    {
+      "file": ".copilot-tracking/squad/members/produit/plans/2026-09-28-merlain-prd-plan.md",
+      "status": "integrated",
+      "keyFindings": "P01 rédigé ; revue P02 terminée, résultat consigné dans la référence de revue ci-dessous. Aucun arrêt après plan ni ancienne question imposée."
+    },
+    {
+      "file": ".copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md",
+      "status": "linked",
+      "keyFindings": "Sept FR-MEM et 27 AC conservés ; dispositions v0.1.1 non réécrites."
+    },
+    {
+      "file": ".copilot-tracking/squad/members/produit/reviews/2026-09-28/merlain-prd-v0.1-review.md",
+      "status": "integrated",
+      "keyFindings": "Revue indépendante P02 terminée : PASS — SPEC DRAFT READY, aucun constat matériel. Approbations humaines produit et technique non accordées ; décisions et approbateurs nommés toujours en attente sous E11 ; sorties Validate/Finalize à false."
+    }
+  ],
+  "identifierCounts": {
+    "fr": 30,
+    "ac": 90,
+    "nfr": 15,
+    "constraint": 6,
+    "goal": 5
+  },
+  "nextActions": [
+    "Arbitrage humain des recommandations R01 à R12 et désignation des approbateurs sous E11 ; revue indépendante P02 terminée sans approbation humaine acquise.",
+    "Instruction des preuves et approbations E01 à E11 avant les engagements concernés."
+  ],
+  "approval": {
+    "validateExit": false,
+    "finalizeExit": false,
+    "qualityReport": ".copilot-tracking/squad/members/produit/reviews/2026-09-28/merlain-prd-v0.1-review.md"
+  }
+}

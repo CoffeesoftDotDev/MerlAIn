@@ -32,3 +32,28 @@ Each entry records a research dispatch this role handled, the findings it produc
   "basis": "tier-default"
 }
 ```
+
+### 2026-09-28T18:01:57.754+02:00 Research: session-memory-evidence
+
+* Turn: 9
+* Request: Evidence for colleague-reported Whisper transcription, Graphiti GraphRAG, storyteller episode/campaign summaries, orchestrator—bounded local task, no network verification
+* Deliverable: .copilot-tracking/squad/members/produit/research/2026-09-28/session-memory-evidence.md
+* Finding Summary: Four external components declared (transcription, RAG, storyteller agent, orchestrator), nonverified by code URL; draft PRD addendum ready despite four unresolved implementation unknowns (exact repository, audio scope, episode-to-chronicle mapping, RAG data scope); compatible with existing manual core and optional AI policy
+* Planning Readiness: ready-with-gaps — unknowns documented, no blockers to draft authoring
+
+#### Consumption
+
+```json
+{
+  "model": "unknown",
+  "model_source": "unresolved",
+  "priced_as": "gpt-6-astra",
+  "model_tier": "extended",
+  "internal_turns": 8,
+  "input_tokens": 102400,
+  "cached_tokens": 409600,
+  "cache_write_tokens": 56000,
+  "output_tokens": 10000,
+  "basis": "tier-default"
+}
+```

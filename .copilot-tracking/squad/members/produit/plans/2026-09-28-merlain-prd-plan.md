@@ -17,6 +17,10 @@
 * Personal book ownership does not itself grant reproduction/redistribution rights; the PRD records the import workflow as a request with a rights prerequisite, not a resolved capability.
 * Only two roles produce artifacts this stage: analyst (PRD Builder) authors, tester (Squad Reviewer) reviews; no architecture/security/platform role is dispatched.
 
+## Authority
+
+**PRD Authority:** All scope, lifecycle, and requirement authority for v0.1 draft rests in `.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md` (30FR90AC15NFR) and its linked memory `.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md` (7FR27AC, lifecycle integrated, cross-linked). Review findings and this plan are historical record only; v0.1 lifecycle supersedes any prior embellishment in decisions.md entries C12, D5–D7, D12.
+
 ## Phase Checklist
 
 ```mermaid
@@ -34,9 +38,11 @@ Before: only the research artifact exists. After: one DRAFT v0.1 PRD and one rev
 |---|---|---|---|
 | DRAFT v0.1 PRD (French) | analyst (PRD Builder) | `.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md` | this plan + research |
 | Review pass on DRAFT v0.1 | tester (Squad Reviewer) | `.copilot-tracking/squad/members/produit/reviews/2026-09-28/merlain-prd-v0.1-review.md` | DRAFT v0.1 PRD |
+| DRAFT session-memory PRD addendum | analyst (PRD Builder) | `.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md` | this plan + [session-memory-evidence.md](../research/2026-09-28/session-memory-evidence.md) |
+| Review pass on session-memory addendum | tester (Squad Reviewer) | `.copilot-tracking/squad/members/produit/reviews/2026-09-28/merlain-session-memory-review.md` | DRAFT session-memory PRD addendum |
 
 <!-- rpi:phase id=P01 -->
-### [ ] P01: Author DRAFT v0.1 PRD
+### [x] P01: Author DRAFT v0.1 PRD
 
 Goals:
 * One internally consistent French DRAFT v0.1 PRD covering only confirmed scope, unresolved items visibly labeled (creates node `D`; per-phase diagrams condensed to the single pair above per PD1).
@@ -45,7 +51,7 @@ Dependencies:
 * None (research artifact already supplied).
 
 <!-- rpi:task id=P01-T01 -->
-#### [ ] P01-T01: Vision, journeys, confirmed requirements, modules, glossary
+#### [x] P01-T01: Vision, journeys, confirmed requirements, modules, glossary
 
 Goals:
 * A reader knows who v0.1 is for (GM, players), their journeys, and has FR-ided acceptance criteria for confirmed behaviors, a conceptual module map, and a glossary with proposal-labeled confidentiality semantics.
@@ -65,7 +71,7 @@ Dependencies:
 * None.
 
 <!-- rpi:task id=P01-T02 -->
-#### [ ] P01-T02: Exclusions, priorities, unresolved register, next question
+#### [x] P01-T02: Exclusions, priorities, unresolved register, next question
 
 Goals:
 * A reader sees what v0.1 excludes, what is prioritized as requested, which open items block a final PRD vs. only the draft, and one recommended next question.
@@ -85,13 +91,39 @@ Dependencies:
 * P01-T01.
 
 <!-- rpi:phase id=P02 -->
-### [ ] P02: Review DRAFT v0.1 PRD
+### [x] P02: Review DRAFT v0.1 PRD
 
 Goals:
 * Confirm the draft states only user-confirmed scope, labels every unknown, and introduces no platform/architecture/AI-contract design (creates node `V`).
 
 Dependencies:
 * P01 (T01–T02) complete.
+
+---
+
+## 2026-09-28 Core PRD Execution Clarification
+
+The following clarifications supersede any contradictory or obsolete statements in the above plan structure:
+
+**Campaigns & Source Linkage:** Independent campaign incarnations and source linkage CONFIRMED as user-scoped (no cross-incarnation visibility in v0.1).
+
+**Content Format:** Text PDFs AND scans/OCR-extracted text CONFIRMED as supported import formats. Configured remote AI allows imported excerpt context in PRD examples; no per-book extra prompt required.
+
+**Player Sheet Access:** Player sheets directly edited with GM-visible edit history. No new preapproval question introduced by edit capability.
+
+**Equipment & Cards:** Equipment managed as card instances, not sheet-wide restrictions preventing full own-sheet access by player role.
+
+**Chronicle Graph:** Scenes/events and manual reconvergence CONFIRMED. Automatic cycles NOT part of v0.1 scope.
+
+**AI Image Protocol:** Not forced to OpenAI; MJ-validated auto-enrichment model remains manual-core with configurable provider.
+
+**VTT & Exports:** Downloadable config-driven exports of all generated practical content CONFIRMED. No direct source transfers; Builder/Strategy/Command used as appropriate for platform dispatch.
+
+**Modular Monolith Confirmation:** P03/P04 (session-memory addendum) completed for memory v0.1.1 scope; boxes checked. P01/P02 (core PRD) now proceed including configurable exports.
+
+**Namespace Correction:** Original FR001–008 are AUTHORING plan IDs. Main PRD uses FR-CORE namespace to avoid confusion with feature-role IDs (FR-MEM, etc.).
+
+**Next Action Override:** Remove obsolete "STOP after plan" directive. Execution proceeds directly to main PRD authoring (P01–P02) following this turn.
 
 <!-- rpi:task id=P02-T01 -->
 #### [ ] P02-T01: Fidelity and scope-boundary review
@@ -110,6 +142,87 @@ References:
 
 Dependencies:
 * P01-T01, P01-T02.
+
+<!-- rpi:phase id=P03 -->
+### [x] P03: Author DRAFT session-memory PRD addendum
+
+Goals:
+* One DRAFT addendum (not a final/full PRD — none exists) covering the user-reported "session memory" module as a **hypothesis about a product goal/pipeline**, not an audit of a verified current system; unknowns visibly labeled; no architecture/council design stage.
+
+Dependencies:
+* [research/2026-09-28/session-memory-evidence.md](../research/2026-09-28/session-memory-evidence.md); technical integration stays gated by future repo/interface evidence, not decided here.
+
+<!-- rpi:task id=P03-T01 -->
+#### [ ] P03-T01: Reported components, actors, and core FR-MEM criteria
+
+Goals:
+* A reader sees the four reported components as declared-not-verified, the actors, and FR-MEM acceptance criteria for audio-to-transcript, the Graphiti retrieval/ingestion boundary, episode summary, and versioned campaign-summary update.
+
+Requirements:
+* FR-MEM-001–FR-MEM-004. Whisper/model/API/version and the storyteller repo are named only (no URL, no verified interface, no MerlAIn-integration claim); no invented performance, hardware, or API detail.
+
+Details:
+* Reported components (verbatim citation, evidence C16 + constats table): Whisper-type audio→transcript; GraphRAG (Graphiti) knowledge base — a distinct graph from the chronicle branching graph, not the same structure; storyteller agent (external repo, capabilities declared only) producing per-episode summaries and updating campaign summaries by fetching missing context from the RAG; orchestrator linking all three.
+* Actors: GM, players, storyteller agent (external, declared), orchestrator (declared; no Dapr assumed, per C9).
+* Episode (this addendum's term) is NOT automatically equal to Chronique = one scene/event (D4); the mapping is an open question, not resolved here.
+* FR-MEM-001: audio input accepted → transcript produced, success/failure observable; Whisper-type named only.
+* FR-MEM-002: Graphiti/GraphRAG retrieval-and-ingestion boundary — campaign/access-scoped retrieval, source/provenance recorded, explicit behavior on missing or conflicting evidence, no invented facts, no automatic secret leakage.
+* FR-MEM-003: per-episode summary produced by the storyteller agent, private draft first.
+* FR-MEM-004: versioned campaign-summary update fetching missing context from the RAG, without assuming fully serial ingestion order.
+
+References:
+* [research/2026-09-28/session-memory-evidence.md](../research/2026-09-28/session-memory-evidence.md): constats table, distinctions, inconnues.
+
+Dependencies:
+* None beyond phase-level.
+
+<!-- rpi:task id=P03-T02 -->
+#### [ ] P03-T02: Orchestrator, manual/optional boundary, safeguards, exclusions
+
+Goals:
+* A reader sees orchestrator success/failure/status criteria, the manual-core-vs-optional-module boundary, RECOMMENDED-labeled safeguards, and explicit non-mandates.
+
+Requirements:
+* FR-MEM-005–FR-MEM-007. Any "Builder/Strategy/Command" reference is recorded as a future technical constraint only, with justification, not an implemented design or diagram.
+
+Details:
+* FR-MEM-005: orchestrator observable success/failure/status across the three linked components.
+* FR-MEM-006: module is optional enrichment on the confirmed manual core; private AI drafts (transcript, summaries) require explicit GM publication before player visibility (reuses D9 gate).
+* FR-MEM-007: cancellation, retry, idempotency, retention, and recording-consent safeguards are labeled **RECOMMENDED (proposal)**, explicitly distinguished from the four user-stated facts.
+* Non-mandates: no required player-side AI use, no diarization/live-recording requirement, no chosen graph database, no legal guarantee, no destructive regeneration of existing summaries.
+
+References:
+* [research/2026-09-28/session-memory-evidence.md](../research/2026-09-28/session-memory-evidence.md): D9/C9/C2 cross-references, safeguards not yet confirmed.
+
+Dependencies:
+* P03-T01.
+
+<!-- rpi:phase id=P04 -->
+### [x] P04: Review DRAFT session-memory PRD addendum
+
+Goals:
+* Confirm the addendum labels declared-vs-verified status correctly, uses FR-MEM ids consistently, and introduces no architecture/platform design.
+
+Dependencies:
+* P03 (T01–T02) complete.
+
+<!-- rpi:task id=P04-T01 -->
+#### [ ] P04-T01: Fidelity and boundary review
+
+Goals:
+* A pass/flag list confirms every FR-MEM is cited, safeguards are labeled RECOMMENDED not fact, episode≠chronique and RAG-graph≠chronicle-graph distinctions hold, and no council/architecture content appears.
+
+Requirements:
+* FR-MEM-001–FR-MEM-007 all cited by at least one addendum section.
+
+Details:
+* Check: external repo capabilities stay "declared, not verified"; no fabricated model/API/hardware/perf detail; no mandated player AI, diarization, graph DB choice, legal guarantee, or destructive regeneration.
+
+References:
+* [research/2026-09-28/session-memory-evidence.md](../research/2026-09-28/session-memory-evidence.md).
+
+Dependencies:
+* P03-T01, P03-T02.
 
 ## User Decisions and Requirements
 
@@ -143,7 +256,7 @@ Dependencies:
 | Plan | `.copilot-tracking/squad/members/produit/plans/2026-09-28-merlain-prd-plan.md` |
 | Changes-record role | Not applicable — no code/implementation stage authorized this run |
 | Continuation owner | Squad Coordinator (dispatches analyst then tester); required gate is the Artifact Gate (plan on disk + Scribe history entry, Scribe-owned) |
-| Next action | Dispatch analyst (PRD Builder) for P01, then tester (Squad Reviewer) for P02; STOP after this plan per user instruction |
+| Next action | Dispatch analyst (PRD Builder) for P01, then tester (Squad Reviewer) for P02; then analyst for P03 and tester for P04 (session-memory addendum); STOP after this plan per user instruction |
 
 ## Scope and Non-Goals
 
@@ -168,6 +281,13 @@ Dependencies:
 * FR-006: PRD lists MVP exclusions and a priority baseline of "included as requested," inventing no phases, percentages, concurrency, or hardware numbers.
 * FR-007: PRD carries an unresolved register distinguishing blocking-to-final-PRD from nonblocking-to-draft items.
 * FR-008: PRD ends with exactly one recommended next interview question.
+* FR-MEM-001: addendum states audio-input-to-transcript acceptance criteria (Whisper-type named only, no model/version/format mandated).
+* FR-MEM-002: addendum states the Graphiti/GraphRAG retrieval-and-ingestion boundary — campaign/access-scoped retrieval, provenance, missing/conflicting-evidence behavior, no invented facts, no automatic secret leakage.
+* FR-MEM-003: addendum states per-episode summary acceptance criteria produced by the storyteller agent, private draft first.
+* FR-MEM-004: addendum states versioned campaign-summary update acceptance criteria, fetching missing RAG context, no assumed fully serial ingestion order.
+* FR-MEM-005: addendum states orchestrator success/failure/status acceptance criteria across the three linked components.
+* FR-MEM-006: addendum states the manual-core-vs-optional-module boundary and reuses the D9 private-draft/explicit-GM-publication gate.
+* FR-MEM-007: addendum labels cancellation/retry/idempotency/retention/recording-consent safeguards as RECOMMENDED (proposal), distinct from the four user-stated facts.
 
 ## Risks and Open Questions
 
@@ -176,10 +296,15 @@ Dependencies:
 | H | risk | Import-rights/consent for personal-book character extraction is unresolved | P01-T02 register | Blocks a final PRD; must not be promised as delivered | Explicit user rights/validation posture | user |
 | M | open question | Chronicle graph/cycles and sheet field-edit/secret authority policy | P01-T01, P01-T02 | Affects glossary and acceptance-criteria depth only for v0.1 | User answer or defer as labeled unknown | user |
 | L | further planning | Template/incarnation separation remains a proposal | P01-T01 | Presented as proposal, not requirement | None needed for v0.1 draft | planner |
+| H | risk | Storyteller repo/interface unverified; capabilities are user-declared only | P03-T01 | Must not be presented as a validated MerlAIn integration | Repo URL + interface evidence (future stage) | user |
+| M | open question | Episode ↔ chronique/scene mapping unresolved | P03-T01 | Affects glossary/acceptance-criteria depth only for the addendum draft | User answer or defer as labeled unknown | user |
+| L | further planning | RECOMMENDED safeguards (cancellation/retry/idempotency/retention/consent) are proposals, not confirmed facts | P03-T02 | Presented as proposal, not requirement | None needed for addendum draft | planner |
 
 ## Sources
 
 * [research/2026-09-28/merlain-specifications-research.md](../research/2026-09-28/merlain-specifications-research.md): user-citation evidence, confidence notes, non-supported-claims list (C12, D1–D12); sole evidence source.
+* [research/2026-09-28/session-memory-evidence.md](../research/2026-09-28/session-memory-evidence.md): bounded addendum evidence for the session-memory module (C16, constats table, D9/C9/C2 cross-references); sole evidence source for P03–P04.
+* [history/Squad Researcher.md](../history/Squad%20Researcher.md): Scribe-owned history entry confirming the addendum research was recorded; read-only reference, not edited here.
 * [decisions.md](../decisions.md): prior entries with embellishments this prompt withdraws, not carried forward.
 * [team.md](../team.md): confirms analyst = PRD Builder (`prd/` root) and tester = Squad Reviewer (`reviews/` root).
 * This prompt (primary user, 2026-09-28): governs over research and prior decisions where they conflict.
