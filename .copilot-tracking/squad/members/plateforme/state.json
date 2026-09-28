@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.4",
+  "updated": "2026-09-28T16:30:12.119Z",
+  "turn": 5,
+  "mode": "interactive",
+  "activeRoles": [
+    "scribe"
+  ],
+  "openEscalations": [],
+  "currentRun": {
+    "sessionModel": "gpt-6-astra",
+    "modelOverrides": {},
+    "estCostUsd": 0.5958,
+    "estCreditsTotal": 59.58,
+    "costPreflight": {
+      "runId": "5506a807-54b9-4668-ae51-2d91e379d22c",
+      "roundId": "",
+      "ceilingUsd": null,
+      "evaluatedSpendUsd": 0,
+      "remainingUsd": null,
+      "plannedDispatches": 0,
+      "projectedCostUsd": 0,
+      "reserveMultiplier": 3.0,
+      "admissionCostUsd": 0,
+      "confidence": "not-applicable",
+      "basis": "not-requested",
+      "decision": "not-requested",
+      "reason": "No cost ceiling configured."
+    }
+  },
+  "notify": {
+    "approvalChannel": "in-chat",
+    "enabled": false,
+    "email": "",
+    "github": {
+      "handle": "",
+      "repo": ""
+    }
+  }
+}
