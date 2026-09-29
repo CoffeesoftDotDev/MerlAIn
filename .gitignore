@@ -1,0 +1,22 @@
+# Node
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# .NET
+bin/
+obj/
+*.user
+
+# Environment
+.env
+.env.local
+
+# Local data volumes
+.data/
+
+# Editors
+.vs/
+.idea/
+.DS_Store

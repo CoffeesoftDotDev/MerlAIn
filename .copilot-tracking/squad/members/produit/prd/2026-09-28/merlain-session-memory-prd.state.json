@@ -1,0 +1,57 @@
+{
+  "prdFile": ".copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md",
+  "lastAccessed": "2026-09-28T18:28:22.441+02:00",
+  "currentPhase": "requirements-gathering",
+  "status": "draft",
+  "scope": "Standalone P03 addendum only; core P01 complete and P02 review completed (SPEC DRAFT READY, no material findings), with human approval still pending; core scope remains separate.",
+  "disclaimerShownAt": "2026-09-28T18:11:45+02:00",
+  "phaseSkillsLoaded": [
+    "prd-author#assess",
+    "prd-author#create",
+    "prd-author#build",
+    "prd-author#integrate"
+  ],
+  "questionsAsked": [],
+  "answeredQuestions": {
+    "product-name": "MerlAIn — mémoire de session",
+    "target-users": "MJ et joueurs, sans usage IA obligatoire",
+    "scope": "FR-MEM-001 à FR-MEM-007 ; capacités rapportées, non vérifiées",
+    "authoring-readiness": "Contexte suffisant pour P03 ; interfaces inconnues non bloquantes pour le brouillon"
+  },
+  "referencesProcessed": [
+    {
+      "file": ".copilot-tracking/squad/members/produit/research/2026-09-28/session-memory-evidence.md",
+      "status": "integrated",
+      "keyFindings": "Quatre capacités rapportées ; aucun dépôt externe vérifié ; graphes distincts. Intégration documentaire seulement."
+    },
+    {
+      "file": ".copilot-tracking/squad/members/produit/plans/2026-09-28-merlain-prd-plan.md",
+      "status": "integrated",
+      "keyFindings": "P03-T01 et P03-T02 rédigés ; la demande actuelle prime sur les divergences du plan."
+    }
+  ],
+  "nextActions": [
+    "Après fourniture du dépôt exact, investigation technique en lecture seule ; aucun déclenchement automatique.",
+    "Soumettre les propositions et politiques ouvertes à revue humaine avant adoption."
+  ],
+  "qualityChecks": [
+    "302 lignes ; sept FR-MEM stables ; 27 critères AC uniques.",
+    "Couverture documentaire FR-vers-AC et FR-vers-objectif : 7/7.",
+    "Citation exacte et liens locaux contrôlés ; JSON valide ; aucun placeholder ni espace final.",
+    "markdownlint indisponible localement ; non exécuté, aucune installation réseau.",
+    "Aucun test produit ou d'intégration ; aucun passage formel Validate/Finalize.",
+    "Revue P04 existante référencée dans approval.qualityReport : RV-001 et RV-002 relevés, formulations corrigées en version 0.1.1 ; aucune nouvelle validation indépendante ni approbation Validate/Finalize."
+  ],
+  "draftReadiness": "complete-for-bounded-P03-draft",
+  "integrationReadiness": "not-established",
+  "approval": {
+    "validateExit": false,
+    "finalizeExit": false,
+    "qualityReport": ".copilot-tracking/squad/members/produit/reviews/2026-09-28/merlain-session-memory-review.md"
+  },
+  "userPreferences": {
+    "language": "fr",
+    "question-style": "Aucun questionnaire ; inconnues documentées",
+    "delegation": "Interdite pour cette rédaction"
+  }
+}
