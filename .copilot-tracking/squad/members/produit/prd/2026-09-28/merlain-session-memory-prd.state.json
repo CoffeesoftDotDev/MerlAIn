@@ -1,9 +1,12 @@
 {
   "prdFile": ".copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md",
-  "lastAccessed": "2026-09-28T18:28:22.441+02:00",
+  "lastAccessed": "2026-11-12",
   "currentPhase": "requirements-gathering",
   "status": "draft",
-  "scope": "Standalone P03 addendum only; core P01 complete and P02 review completed (SPEC DRAFT READY, no material findings), with human approval still pending; core scope remains separate.",
+  "scope": "Deferred future session-memory extension. Current release has only rulebook chat and grounded character/NPC/monster generation as priorities; September core review is historical.",
+  "version": "0.1.2",
+  "deliveryStatus": "deferred-after-rulebook-mvp",
+  "currentReleasePrd": ".copilot-tracking/squad/members/produit/prd/2026-11-12/merlain-rulebook-mvp-prd.md",
   "disclaimerShownAt": "2026-09-28T18:11:45+02:00",
   "phaseSkillsLoaded": [
     "prd-author#assess",
@@ -31,8 +34,8 @@
     }
   ],
   "nextActions": [
-    "Après fourniture du dépôt exact, investigation technique en lecture seule ; aucun déclenchement automatique.",
-    "Soumettre les propositions et politiques ouvertes à revue humaine avant adoption."
+    "No session-memory work is required for the current two-priority MVP.",
+    "When this extension is explicitly reprioritized, obtain exact repositories/revisions and review integration, source separation and privacy policies before adoption."
   ],
   "qualityChecks": [
     "302 lignes ; sept FR-MEM stables ; 27 critères AC uniques.",

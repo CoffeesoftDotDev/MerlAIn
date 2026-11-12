@@ -1,143 +1,141 @@
-# Starting MerlAIn V1 from the specifications baseline
+# Implementing the two-priority MerlAIn MVP
 
-This guide separates work the team can start now from decisions and evidence needed
-before implementation or activation. It does not approve policies, choose a new stack,
-or replace the [core PRD](../.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md)
-and [session-memory addendum](../.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md).
+Updated 12 November 2026. The
+[current MVP PRD](../.copilot-tracking/squad/members/produit/prd/2026-11-12/merlain-rulebook-mvp-prd.md)
+is the authority for the product MVP. Its only delivery priorities are **P1: chat
+with an ingested rulebook** and **P2: book-grounded character/NPC/monster generation
+with statistics, backstory and an image**.
 
-## What changed in this branch
+The former campaign-first milestone and the September Must/Should ordering are no
+longer prerequisites. The
+[broader PRD](../.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md)
+and [memory addendum](../.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md)
+remain deferred references, not extra priorities.
 
-At the user's request, the branch now contains specifications, documentation and
-Copilot/squad material, plus Git metadata and `.gitignore` for repository hygiene.
-The cleanup removed 64 implementation/build/runtime files: the React/Vite frontend,
-ASP.NET API and worker, shared libraries, SQL and proxy configuration, Dockerfiles,
-Compose and devcontainer files, environment example, solution/build files, npm
-manifests and lockfile. No application code or replacement runtime was introduced.
+## What exists today
 
-Both existing READMEs were retained as historical documents:
-[scaffold overview](history/scaffold-readme.md) and
-[module authoring](history/module-authoring.md). The root README now describes the
-specifications-only state. Existing PRDs, lifecycle companions, squad records,
-research, plans, reviews and Copilot instruction files are unchanged.
+The repository is specifications-only. The cleanup baseline was merged into `main`
+through [#1](https://github.com/CoffeesoftDotDev/MerlAIn/pull/1) after
+[#12](https://github.com/CoffeesoftDotDev/MerlAIn/pull/12).
+There is no runnable UI, parser, RAG, agent, image generator, Compose stack or build
+tooling. The current PRD revision is unapproved and has no independent review result.
 
-**Historical evidence is not current architecture.** References to `apps/`, `libs/`,
-`infra/`, the old Compose file or the old README in retained research and squad history
-describe the pre-cleanup repository at
+The historical [scaffold README](history/scaffold-readme.md) and
+[module guide](history/module-authoring.md) describe removed code. Their modular
+monolith, commands and account-linking behavior are not current implementation contracts.
+Old source evidence remains available at
 [commit 5025421](https://github.com/CoffeesoftDotDev/MerlAIn/tree/5025421320d06162bcde319da9f9b32d1a0e1224).
-Consult that snapshot rather than recreating the old modular monolith by default.
-Its documentation included aspirations beyond the implemented scaffold.
 
-This is a source-tree cleanup only. It does not stop running services, delete Docker
-volumes or databases, remove data outside the worktree, or erase Git history.
+## First development milestone: agent in DevUI
 
-## Agree the first slice
+The user will start with the agent foundation before building an application. This is
+a bounded part of P1, not completion of either product priority:
 
-Recommended milestone: a GM authenticates, creates a campaign, stores a private idea
-and publishes a scene. A player sees only authorized material. Data survives restart.
-The workflow functions with AI disabled.
+1. Run Microsoft Agent Framework locally with DevUI and an OpenAI Responses client
+   connected to the configured Microsoft Foundry model deployment using Entra
+   tenant/client ID and client secret. Confirm endpoint, API version and tool support;
+   "Responses V2" is not evidence of a particular documented API version.
+2. Connect a read-only local MCP retrieval tool. Evaluate Meilisearch first; use a
+   synthetic authorized Markdown fixture and report missing evidence or tool failures.
+3. Persist conversation messages and the state required to resume each thread in
+   PostgreSQL in Docker Compose. Verify multi-turn continuity and thread isolation
+   after a restart; a remote conversation ID alone is not proof of local history.
+4. Bind the host DevUI port to loopback; do not expose MCP, PostgreSQL or search
+   externally by default. No MerlAIn user authentication is required on this
+   single-user trusted host. DevUI's own development authentication may remain
+   enabled; network/multi-user access needs a separate security boundary.
 
-This is not a reduction of V1: reusable characters and sheets, branching chronicles,
-imports, AI, memory and exports remain in the PRDs and require subsequent delivery work.
-The existing nine issues cover a first workflow and two investigations, not the entire V1.
+Foundry inference is remote: prompts and retrieved excerpts can leave the host and
+provider retention must be reviewed. Put the client secret outside source, logs and
+browser-visible configuration. No hosted Foundry agent is required.
 
-## Work order and ownership
+## Remaining work inside the two priorities
 
-Issue status at this cleanup: all nine issues below were open and unassigned. Role
-names are suggested responsibilities, not accepted assignments or delivery dates.
-
-| Work | Can start when | Expected handoff |
+| Step | Result | Dependency / exclusive ownership suggestion |
 | --- | --- | --- |
-| [#3 Policies](https://github.com/CoffeesoftDotDev/MerlAIn/issues/3) - product with technical review | Now | Accepted identity, membership and publication policies for the slice; named approvers |
-| [#4 Contracts and ownership](https://github.com/CoffeesoftDotDev/MerlAIn/issues/4) - technical lead | Discovery now; freeze after #3 | Service/API/event contracts, Dapr interactions, module dependencies, storage boundaries, directory ownership and acceptance-test mapping |
-| [#5 Local foundations](https://github.com/CoffeesoftDotDev/MerlAIn/issues/5) - platform | #3 and #4 resolved; clean baseline shared | New Compose/Dapr foundation, configuration, persistent storage, disabled-AI mode and agreed development/verification commands |
-| [#6 Identity](https://github.com/CoffeesoftDotDev/MerlAIn/issues/6) - identity owner | Contracts and foundations available | Local/OIDC access and campaign membership under the agreed policies |
-| [#7 Campaign backend](https://github.com/CoffeesoftDotDev/MerlAIn/issues/7) - domain owner | Contracts and foundations available | Persistent campaigns, private notes and controlled scene publication |
-| [#8 GM/player UI](https://github.com/CoffeesoftDotDev/MerlAIn/issues/8) - frontend owner | Contracts and foundations available | Accessible manual workflow using agreed contracts |
-| [#9 Integration](https://github.com/CoffeesoftDotDev/MerlAIn/issues/9) - integration/quality owner | #5 through #8 delivered | Evidence for the complete workflow, isolation, restart persistence and AI-disabled behavior |
-| [#10 Memory contracts](https://github.com/CoffeesoftDotDev/MerlAIn/issues/10) - component owners | Exact repositories and revisions supplied | Verified Whisper, Graphiti, Storyteller and orchestrator interfaces, licenses and failure behavior |
-| [#11 Export capabilities](https://github.com/CoffeesoftDotDev/MerlAIn/issues/11) - integration research owner | Documentation research now | Target/version/format evidence and controlled import checks before claiming native compatibility |
+| P1: source fixture and contracts | Identify authorized book, game/edition, PDF pages, Markdown schema and H2/H3 policy | Product/MJ and integration owner; synthetic fixture can be prepared before the actual book is supplied |
+| P1: local ingestion | PDF/OCR to reviewable Markdown with page provenance and non-overlapping H2/H3 sections | Parser owner; no fixed-token splitter that violates section boundaries |
+| P1: retrieval/tool contract | Versioned local index, scoped MCP search and section reading, explicit errors and activation | Retrieval owner; select one backend, not two |
+| P1: Agent Framework chat | Extend the DevUI milestone to bounded retrieval, verifiable page citations and insufficient-evidence behavior | Agent owner consumes agreed MCP contract |
+| P1/P2: application UI and persistence | Later app: books, chat and generator views, states, corrections and saved revisions | UI owner can use contract fixtures in parallel; storage/contract changes have one owner |
+| P2: grounded generation | Character, NPC and monster schemas, editable backstory/stats with provenance | Generation owner consumes the P1 retrieval contract; edition schema reviewed by MJ |
+| P2: images | Actual generated image linked to the saved draft revision, separate retries/failure state | Image-adapter owner; text remains usable if image generation fails |
+| P1/P2: acceptance | Both end-to-end outcomes, private access, injection/absence cases and restart persistence | Integration/quality owner maps evidence to the 36 AC and ten NFR |
 
-After the shared foundation, #6, #7 and #8 can run in parallel in exclusive directories.
-Use contract-compatible mocks where needed; end-to-end authentication and publication
-cannot be declared done from mocks alone. Assign shared contract/configuration changes
-to one owner and coordinate revisions before dependent work proceeds.
+These are implementation work packages, **not additional product priorities**.
+Do not implement campaign membership, an audio graph or a plugin marketplace as a
+hidden prerequisite. Local-only access and safe storage are still necessary;
+no user authentication does not authorize publicly exposed books, MCP admin tools
+or a network-accessible index.
 
-### Baseline and tracker reconciliation
+## Architecture decision to settle
 
-The specification PR [#2](https://github.com/CoffeesoftDotDev/MerlAIn/pull/2) was already
-merged into `feat/scaffolding`. The repository default branch is `main`; it must not
-be assumed to contain that specification baseline. This cleanup needs its own reviewed
-change before the team starts from a common clean commit. It is not an update to
-the already merged PR.
+Microsoft Agent Framework owns the conversational/tool loop and calls local retrieval
+through MCP. Dapr is deferred as an MVP dependency, not declared incompatible with MCP.
+Application services remain local Docker Compose, running Linux-compatible containers.
+A standalone Linux-host development mode would need an explicit later decision.
 
-The existing issue bodies were written against the earlier scaffold and still refer
-to its paths. **No tracker writes were made during this cleanup.** Before implementation,
-reconcile #4 and dependent issue ownership/path references with the new baseline.
-Old paths are historical or candidate future locations, not files to extend today.
-Keep one agreed integration base and do not let one team rebuild the scaffold while
-another is still removing it.
+Evaluate **Meilisearch** first for retrieval, with Agent Framework and MCP; it is
+not yet a proven integration. **Docling** is the proposed local open-source
+PDF-to-Markdown option for the subsequent ingestion step. Document Intelligence is
+a cloud alternative only if PDF transmission is explicitly accepted. Haystack
+retrieval exposed by Hayhooks/MCP plus Qdrant is a fallback, not a second stack to
+build in parallel. The PRD's source table documents
+Meilisearch's experimental native MCP and mixed edition/license caveats.
 
-## Decisions still needed before coding
+Before selecting, verify that the parser preserves headings, page ranges and tables;
+the chosen embedder can accommodate the approved section sizes; MCP versions and
+tool schemas interoperate; and retrieved results can support traceable answers.
+Docling's stock chunkers do not by themselves guarantee the required H2/H3 policy.
+Do not silently split long sections: surface them for structural review as specified.
 
-The core PRD section 11 is the decision register. Its R01-R12 entries are
-recommendations, not approvals; completing or merging a document does not adopt them.
+Select one stack, record compatible versions and code/model licenses, and prove
+tool calling against the actual OpenAI-compatible text endpoint. Embeddings and
+images have separate compatibility checks. No FoundryVTT or Storyteller proof is
+required to start this MVP.
 
-| Gate | Decision or evidence needed | Scope |
-| --- | --- | --- |
-| Product policy (#3; E01/E02) | First-admin bootstrap, account recovery and linking, campaign admission/roles, ownership transfer and publication behavior | Before coding the affected identity and audience rules |
-| Architecture/contracts (#4; E10) | Service boundaries and languages, UI stack, versioned contracts, Dapr transports, module enablement/dependencies, storage and ownership | Before teams implement independently; justify Builder/Strategy/Command only where useful |
-| Quality agreement (#4/#5/#9) | Map the slice to FR/AC/NFR identifiers; define authorized fixtures, denied-access cases, accessibility checks, restart checks and reproducible build/test commands | Before treating the first integrated workflow as complete |
-| Team and integration | Assign the open issues, approvers and shared-file owners; settle the integration base after cleanup | Before parallel implementation |
+## Remaining bounded inputs
 
-Do not silently turn the old README's account-linking behavior into a requirement.
-The PRD's local Compose deployment, Dapr/polyglot direction, local/OIDC access and
-GM/player scope are already established; the clean slate is not permission to reopen them.
+- Identify the actual rulebook, edition, language and authorized PDF; the supplied
+  description does not establish a specific published title or The One Ring edition.
+- Review the proposed H2/H3 edge-case policy and test page provenance on that PDF.
+- Agree the minimal statistics schema for each of the three generation types.
+- Supply Foundry tenant, client ID, secret, endpoint and a Responses/tool-capable
+  deployment through local secret configuration, not the repository. Confirm effective
+  permissions and provider data retention.
+- Choose embedding/image endpoints, storage/retention and local resource limits. Measure performance rather than inventing
+  latency or hardware guarantees.
+- Review the revised PRD; September's PASS does not validate this scope or a working stack.
 
-### Reconcile retained authoring guidance
+These inputs are needed at their integration/acceptance boundary, not a reason to
+delay documentation or preparation with synthetic authorized fixtures.
 
-The instruction files were preserved as requested, but they are not a coherent stack
-decision. In particular:
+## Existing backlog is not the current delivery order
 
-- [Next.js guidance](../.github/instructions/nextjs.instructions.md) applies broadly to
-  TypeScript/JavaScript/CSS, although the removed UI was Vite. Select the V1 UI stack
-  in #4, then scope the framework guidance accordingly.
-- [C# guidance](../.github/instructions/csharp.instructions.md) targets modern C# while
-  [legacy .NET Framework guidance](../.github/instructions/dotnet-framework.instructions.md)
-  also matches all C#/project files and requires C# 7.3 and MSBuild. Resolve that overlap
-  for the selected services rather than letting competing instructions choose tooling.
-- Hosting examples in general guidance do not override the local-only application
-  deployment constraint. Optional remote dependencies remain permitted.
+No GitHub issues were created, edited or closed in this specification task.
+The existing issues [#3](https://github.com/CoffeesoftDotDev/MerlAIn/issues/3) through
+[#9](https://github.com/CoffeesoftDotDev/MerlAIn/issues/9) cover the old campaign-first
+workflow; they need a separately authorized reprioritization, not automatic execution.
+Parts of contracts, local foundations, UI and quality may be reused after their scope
+is reconciled. The memory investigation
+[#10](https://github.com/CoffeesoftDotDev/MerlAIn/issues/10) and export investigation
+[#11](https://github.com/CoffeesoftDotDev/MerlAIn/issues/11) are deferred, not MVP blockers.
 
-Treat this as a contract-readiness concern in #4, not evidence that a particular
-language, frontend framework or authentication library has already been selected.
+Do not treat unmodified tracker titles, old squad planning records or archived source
+paths as higher authority than the 12 November user direction and current PRD.
 
-## Work that need not block the manual slice
+## Future integration, not current work
 
-Memory integration needs repository URLs/revisions, real interfaces and an agreed
-episode/session/chronicle mapping (E03/R12). The Graphiti knowledge graph is distinct
-from the narrative branch graph. A reported component is not an integration proof.
+After P1/P2, the colleague's audio-to-summary/knowledge-base module may add played
+campaign facts alongside the rulebook corpus. A later interactive deepwiki can connect
+them with provenance, permissions and explicit distinctions between official rules,
+generated proposals and events that actually happened. Source identities and revisions
+support that future; implementing Graphiti, audio ingestion or wiki synchronization
+now would exceed the two priorities.
 
-Native FoundryVTT/Roll20 compatibility needs versions, systems/sheets, supported content
-types and import evidence (E04). Downloadable exports remain the product boundary;
-direct transfer and synchronization are not implied. The generic fallback R08 still
-needs approval.
+Retained Copilot instructions still include overlapping modern C#/legacy .NET and
+broad Next.js guidance. Reconcile their applicability to the chosen services before
+coding; generic cloud-hosting examples do not override the local deployment constraint.
 
-Before activating the relevant later capabilities, settle source rights and authorized
-fixtures (E05), audio consent and retention (E06), measured limits (E07), backup/restore
-and disablement policy (E08), and provider/OCR contracts (E09). Image APIs are independent
-of the OpenAI-compatible text interface; an Anthropic integration is not in scope.
-These are targeted readiness gates, not reasons to delay all manual workflow work.
-
-Once the first slice's contracts are settled, turn the remaining V1 requirements into
-additional dependency-aware work packages. Do not label completion of #3 through #11
-as completion of the full PRDs.
-
-## Ready to implement means
-
-The team shares the cleaned baseline, has accepted the slice's policies, has frozen
-contracts and file ownership, and knows which acceptance checks demonstrate success.
-Document unresolved capability-specific decisions explicitly instead of inventing
-approvals, compatibility, performance targets or delivery dates.
-
-This guide is AI-assisted readiness guidance, not product approval, an implementation
-result or a legal/security certification.
+This is AI-assisted implementation-readiness guidance, not a product signoff, deployment
+result, legal certification or a claim that the recommended stack has been tested.

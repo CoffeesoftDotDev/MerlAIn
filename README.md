@@ -1,7 +1,7 @@
 # MerlAIn
 
-MerlAIn is a planned, administrator-composable assistant for tabletop RPG game masters
-and players.
+MerlAIn helps a tabletop RPG game master understand a rulebook and create material
+for a first campaign.
 
 **This branch is specifications-only.** The previous application scaffold, runtime
 infrastructure and build tooling have been removed. There is no runnable application,
@@ -11,53 +11,69 @@ Docker Compose stack or package installation step here yet.
 
 | Document | Purpose |
 | --- | --- |
-| [Core PRD](.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md) | Campaigns, characters, permissions, imports, optional AI, exports and acceptance criteria |
-| [Session-memory PRD](.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md) | Audio transcription, Graphiti/GraphRAG, Storyteller summaries and orchestration |
-| [Implementation readiness](docs/implementation-readiness.md) | Remaining decisions, team issue dependencies and the new baseline |
+| [Current MVP PRD v0.2.1](.copilot-tracking/squad/members/produit/prd/2026-11-12/merlain-rulebook-mvp-prd.md) | Two product priorities and the initial DevUI-first development milestone |
+| [Implementation readiness](docs/implementation-readiness.md) | Work order for the revised MVP and deferred backlog |
+| [Broader product reference](.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md) | Campaigns, players, journals and exports retained for later, not additional MVP prerequisites |
+| [Deferred session-memory PRD](.copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md) | Future audio, Graphiti/GraphRAG, Storyteller and campaign-memory extension |
 | [Squad federation](.copilot-tracking/squad/federation.md) | Product and platform squad responsibilities |
 
-The PRDs are reviewed drafts, **not human-approved delivery commitments**. The core
-PRD's sections 11 and 14 distinguish confirmed requirements, proposed policies and
-missing evidence. Merging documentation does not approve its recommendations.
+**Priorities changed on 12 November 2026.** The current PRD is a new draft awaiting
+review, not a human-approved delivery commitment. The September review applies only
+to the broader historical scope; it does not approve this revision.
 
-## Product direction
+## Exactly two delivery priorities
 
-- An administrator selects the enabled capabilities. Frontend and server composition
-  target polyglot services communicating through Dapr, deployed exclusively through
-  local Docker Compose.
-- Configured external dependencies are permitted, including remote Authentik/OIDC,
-  data services and AI endpoints. Local application deployment does not mean that
-  every dependency or data transfer stays on the same machine.
-- GMs and players use local username-or-email/password accounts or OIDC, with
-  campaign-scoped permissions and audience-aware content.
-- Campaigns support narrative direction, private GM ideas, a shared journal, and
-  branching/reconverging chronicles representing scenes or events.
-- A reusable character library covers custom NPCs, official-character references and
-  potential player characters, including characters not yet placed in a story.
-  Campaign incarnations retain their source link without sharing mutable state.
-- D&D 5e 2014/2024 and The One Ring 2e use edition-adapted sheets, not a promised full
-  rules engine. Text and scanned-PDF imports require human review and respect source rights.
-- Optional text AI uses OpenAI-compatible endpoints; image generation has its own
-  provider contracts. No Anthropic-specific integration is planned at this stage.
-  The manual core must work without AI; player-facing AI publication needs GM approval.
-- Generated content is exportable through downloadable files/packages and configurable
-  target mappings. FoundryVTT and Roll20 are intended targets, not yet verified native
-  integrations. Direct transfer and bidirectional synchronization are out of scope.
+1. **Chat with the rulebook.** Import an authorized PDF, convert it locally to Markdown,
+   review its headings and index sections at H2/H3 boundaries. Microsoft Agent Framework
+   calls the local retrieval system through MCP. Answers cite the selected book/edition,
+   section and page, or explicitly say the evidence is missing.
+2. **Generate characters, NPCs and monsters.** Use that corpus to draft backstory and
+   structured statistics, then produce an image. Distinguish sourced rules from creative
+   additions, allow human corrections and preserve each saved version.
 
-Builder, Strategy and Command patterns are to be used where relevant and justified,
-not imposed on every component. The PRDs remain authoritative over this summary.
+A later basic private web application supports import, chat, source inspection and generation.
+PDF conversion, persistence and access protections support these outcomes; they are
+not separate product priorities. Oversized or poorly detected sections require explicit
+review rather than silent truncation or arbitrary cross-heading chunks.
 
-## First implementation milestone
+## Technical direction and later scope
 
-Deliver one complete manual workflow: a GM signs in, creates a campaign, records a
-private idea and publishes a scene; a player sees only authorized content; saved data
-survives an application restart. This is the first slice of V1, not the entire V1.
+Start development with **Agent Framework + DevUI**, the Responses API and local
+MCP retrieval. Store conversation history and the state needed to resume it in
+**PostgreSQL under Docker Compose**. Evaluate **Meilisearch** first for local RAG.
+Use a configured Microsoft Foundry endpoint with an Entra application client ID
+and secret; this authenticates the client to Foundry, not a user to MerlAIn.
+DevUI is a development tool, not the later application or a production UI.
 
-Start with [policy decisions #3](https://github.com/CoffeesoftDotDev/MerlAIn/issues/3)
-and [contracts/ownership #4](https://github.com/CoffeesoftDotDev/MerlAIn/issues/4),
-then [local foundations #5](https://github.com/CoffeesoftDotDev/MerlAIn/issues/5).
-The [readiness guide](docs/implementation-readiness.md) explains when identity,
-campaign backend and UI work can proceed in parallel.
+There is no application authentication for the initial single-user local profile:
+publish DevUI on host loopback only, and keep PostgreSQL, MCP and the index private.
+This does not protect against other users on the same host. Add an appropriate
+authentication boundary before any network or multi-user exposure.
+
+Application services remain local under Docker Compose, compatible with Linux containers.
+The parser, index and retrieval run locally; configurable remote inference endpoints
+remain possible, with data destinations visible. Text models use OpenAI-compatible APIs;
+image-provider contracts are separate. No Anthropic-specific integration is requested.
+
+**Docling** is an open-source local PDF-to-Markdown candidate to evaluate after the
+agent foundation; its H2/H3 handling requires a specific adapter. Document Intelligence
+is a cloud alternative requiring an explicit data-transfer decision. Meilisearch's
+native MCP capability is experimental and its edition/license boundaries require
+verification; Haystack/Hayhooks + Qdrant is a fallback. Nothing has been installed
+or validated as an integrated stack.
+
+MCP is the immediate agent-tool boundary. **Dapr is not a prerequisite for this MVP**;
+MCP and Dapr are not inherently incompatible. Builder, Strategy and Command remain
+conditional design tools, not reasons to build a general-purpose module platform first.
+
+Full campaigns, players/accounts/OIDC, collaborative sheets, journals, VTT exports,
+audio ingestion, Graphiti, Storyteller and an interactive deepwiki are deferred.
+The future vision connects rulebook knowledge with played campaign history without
+confusing official rules and invented events.
+
+Start with the [revised readiness guide](docs/implementation-readiness.md), not the
+September campaign-first issue order. Existing GitHub issues were not changed by this
+specification revision.
 
 ## Repository contents
 
