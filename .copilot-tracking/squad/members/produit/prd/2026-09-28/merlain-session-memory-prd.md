@@ -2,9 +2,11 @@
 prd_id: merlain-session-memory
 title: "MerlAIn — Addendum autonome : mémoire de session"
 status: draft
-version: 0.1.1
+version: 0.1.2
 created_date: 2026-09-28
-last_updated: 2026-09-28
+last_updated: 2026-11-12
+delivery_status: deferred-after-rulebook-mvp
+current_release_prd: ../2026-11-12/merlain-rulebook-mvp-prd.md
 diagram_format: none
 source_brd_id: null
 product_goal_ids: [GOAL-001, GOAL-002, GOAL-003]
@@ -19,10 +21,20 @@ requirement_id_prefixes:
 
 # MerlAIn — Addendum autonome : mémoire de session
 
-**DRAFT autonome, version 0.1.1 — P03-T01 et P03-T02 uniquement.**
+> **Module différé après le MVP, décision du 12 novembre 2026.** Le
+> [PRD courant](../2026-11-12/merlain-rulebook-mvp-prd.md) ne priorise que le chat
+> avec un livre ingéré et la génération de personnages/PNJ/monstres avec image,
+> backstory et statistiques. Whisper, Graphiti, Storyteller, résumés et deepwiki
+> ne sont pas un troisième chantier obligatoire. Leurs exigences ci-dessous sont
+> conservées pour une future extension, pas supprimées ni déclarées intégrées.
+> La future complémentarité distingue les règles du livre des faits vécus en campagne ;
+> la mémoire de campagne pourra enrichir la création sans transformer ces faits en règles officielles.
+
+**DRAFT autonome, version 0.1.2 — référence différée P03-T01 et P03-T02.**
+Révision éditoriale de priorité uniquement ; les sept FR, 27 AC et dispositions de revue v0.1.1 sont conservés.
 Ce document n’est ni un PRD complet, ni une approbation de l’ensemble des garde-fous proposés.
 Lors de la rédaction initiale de cet addendum, le PRD de base et les livrables P01/P02 étaient absents : constat historique, désormais dépassé pour P01 et P02.
-Le [PRD principal MerlAIn v0.1](merlain-prd-v0.1.md) est maintenant le point d'entrée ; sa [revue P02 est terminée](../../reviews/2026-09-28/merlain-prd-v0.1-review.md) : PASS — SPEC DRAFT READY, aucun constat matériel, sans approbation humaine produit ou technique. Cet addendum conserve ses sept FR-MEM, 27 AC et dispositions v0.1.1.
+Le [PRD large MerlAIn v0.1](merlain-prd-v0.1.md) reste la référence du cadrage de septembre ; sa [revue P02 historique est terminée](../../reviews/2026-09-28/merlain-prd-v0.1-review.md) : PASS — SPEC DRAFT READY, aucun constat matériel, sans approbation humaine produit ou technique. Le PRD courant du 12 novembre lié ci-dessus gouverne le MVP produit et son premier jalon DevUI/agent. Cet addendum conserve ses sept FR-MEM, 27 AC et dispositions v0.1.1.
 Aucune capacité décrite ici n’est déclarée intégrée, testée ou implémentée dans MerlAIn.
 Responsable de rédaction : analyste du squad produit ; approbateurs produit et technique à désigner.
 
@@ -264,6 +276,9 @@ Aucune NFR chiffrée autonome n’est approuvée ; ces regroupements ne constitu
 Couverture documentaire FR→AC et FR→objectif : 7/7 chacune ; ce n’est ni un taux de tests réussis ni une validation d’intégration.
 
 ## 8. Décisions ouvertes, dépendances et risques
+
+Ces sujets sont différés avec le module : aucun dépôt audio ou contrat Graphiti/Storyteller
+n'est requis pour livrer les deux priorités du PRD courant.
 
 Les éléments suivants ne bloquent pas la rédaction ; ils conditionnent la conception, la recette ou la mise en service correspondante.
 Les responsables indiqués sont des interlocuteurs proposés, sans attribution nominative ni échéance engagée.

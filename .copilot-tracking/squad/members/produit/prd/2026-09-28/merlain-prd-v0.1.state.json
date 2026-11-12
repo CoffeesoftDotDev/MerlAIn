@@ -1,11 +1,15 @@
 {
   "prdFile": ".copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md",
-  "lastAccessed": "2026-09-28T19:14:39.457+02:00",
+  "lastAccessed": "2026-11-12",
   "currentPhase": "integrate",
   "status": "draft",
   "authoringStatus": "complete",
-  "reviewStatus": "completed",
+  "reviewStatus": "historical-review-only",
   "approvalStatus": "not-approved",
+  "version": "0.1.1",
+  "deliveryStatus": "deferred-broad-scope-reference",
+  "currentReleasePrd": ".copilot-tracking/squad/members/produit/prd/2026-11-12/merlain-rulebook-mvp-prd.md",
+  "priorityChange": "2026-11-12: Only rulebook chat and grounded character/NPC/monster generation are current delivery priorities. Broad September requirements retain their IDs but are not additional MVP prerequisites.",
   "disclaimerShownAt": "2026-09-28T18:11:45+02:00",
   "phaseSkillsLoaded": [
     "prd-author#assess",
@@ -49,8 +53,8 @@
     "goal": 5
   },
   "nextActions": [
-    "Arbitrage humain des recommandations R01 à R12 et désignation des approbateurs sous E11 ; revue indépendante P02 terminée sans approbation humaine acquise.",
-    "Instruction des preuves et approbations E01 à E11 avant les engagements concernés."
+    "Use currentReleasePrd for first-release scope and decisions; the September PASS is historical and does not approve the new MVP.",
+    "Revisit broad-scope R01-R12 and E01-E11 only for the later capabilities they concern; they are not collectively gates for the two-priority MVP."
   ],
   "approval": {
     "validateExit": false,

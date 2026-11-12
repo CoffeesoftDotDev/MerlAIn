@@ -2,14 +2,16 @@
 prd_id: merlain-core
 title: "MerlAIn — PRD principal V1"
 status: draft
-version: 0.1.0
+version: 0.1.1
 created_date: 2026-09-28
-last_updated: 2026-09-28
+last_updated: 2026-11-12
 owners: ["Analyste produit — PRD Builder"]
 reviewers: ["Responsables produit, technique et qualité à désigner"]
 authoring_status: complete
-review_status: completed
+review_status: historical-review-only
 approval_status: not-approved
+delivery_status: deferred-broad-scope-reference
+current_release_prd: ../2026-11-12/merlain-rulebook-mvp-prd.md
 diagram_format: none
 source_brd_id: null
 product_goal_ids: [GOAL-CORE-001, GOAL-CORE-002, GOAL-CORE-003, GOAL-CORE-004, GOAL-CORE-005]
@@ -28,8 +30,20 @@ requirement_id_prefixes:
 
 # MerlAIn — PRD principal V1
 
+> **Priorisation remplacée le 12 novembre 2026.** Le
+> [PRD courant : livre de règles, chat RAG et génération](../2026-11-12/merlain-rulebook-mvp-prd.md)
+> définit les **deux seules priorités du MVP produit**, dont le premier jalon est DevUI/agent. Le présent document
+> conserve la vision large et ses identifiants ; ses mentions de V1, Must/Should,
+> parcours campagne-first, Dapr requis et approbations attendues décrivent le cadrage
+> de septembre, pas des prérequis supplémentaires du MVP courant.
+> Agent Framework/MCP est l'intégration immédiate ; Dapr, joueurs, campagnes complètes,
+> mémoire audio et exports VTT sont différés. Les invariants de confidentialité,
+> provenance et conservation utiles aux deux priorités restent applicables.
+> La revue PASS de septembre porte uniquement sur l'ancien périmètre, pas sur le nouveau PRD.
+
 **Brouillon v0.1, rédaction complète pour revue ; aucune approbation produit ou technique.**
-Ce document est le point d'entrée des spécifications fonctionnelles. Il décrit la cible, pas des fonctionnalités déjà livrées.
+Ce document est la référence fonctionnelle du périmètre large de septembre, désormais différé.
+Le PRD courant lié ci-dessus est le point d'entrée du MVP produit. Ces documents décrivent des cibles, pas des fonctionnalités déjà livrées.
 Le [module mémoire de session v0.1.1](merlain-session-memory-prd.md) le complète sans être remplacé : ses sept FR-MEM, 27 AC locaux et dispositions de revue restent distincts.
 V1 désigne un périmètre produit, pas une date de livraison ni une garantie de disponibilité des intégrations.
 
@@ -39,7 +53,8 @@ MerlAIn aide un maître du jeu (MJ) à préparer une campagne, organiser ses sc�
 Les joueurs participent dès V1 : consultation des contenus publiés, accès à leur fiche complète, édition directe de celle-ci, cartes d'équipement et journal partagé.
 Le problème adressé est la continuité entre préparation privée, informations jouables et réutilisation des contenus ; c'est une synthèse du besoin exprimé, non une étude de marché.
 
-Le noyau fonctionne manuellement. L'IA textuelle et la génération d'images font partie de V1, comme capacités optionnelles configurables.
+Dans le cadrage historique de septembre, le noyau fonctionne manuellement. L'IA textuelle et la génération d'images font partie de V1, comme capacités optionnelles configurables.
+Pour le MVP produit actuel, le chat RAG et la génération sont au contraire les deux résultats centraux ; le premier jalon est l'agent dans DevUI. Voir le PRD courant ci-dessus.
 Elles peuvent enrichir la préparation privée du MJ ; tout contenu IA destiné aux joueurs exige une validation MJ portant sur une version et une audience.
 Le journal rédigé par les humains suit une règle différente : publication directe et modération a posteriori par le MJ.
 
@@ -561,6 +576,9 @@ La construction d'un paquet, le choix d'une représentation et une opération d'
 
 ### 10.2 FR vers objectifs et sources
 
+**Table historique, non applicable à la priorité de livraison actuelle.** Les Must
+ci-dessous n'ajoutent pas de conditions au MVP du 12 novembre ; sa propre matrice fait foi.
+
 La priorisation MoSCoW ci-dessous est **RECOMMANDATION A VALIDER** pour V1 : M = Must, S = Should, C = Could conditionnel.
 Should ne retire pas une fonctionnalité confirmée de V1 : toute coupe du périmètre confirmé exige une décision produit explicite.
 Must identifie les invariants nécessaires à un noyau cohérent et confidentiel, pas une promesse de calendrier.
@@ -603,6 +621,9 @@ La proportion élevée de Must protège les frontières d'identité, de données
 La mémoire conserve ses sept exigences et 27 critères locaux, non additionnés aux 30 FR/90 AC du noyau.
 
 ### 10.3 Livraison et exclusions
+
+**Périmètre large conservé pour l'après-MVP.** Cette section ne définit plus la
+première livraison ; elle ne doit pas imposer joueurs, campagnes ou exports avant le chat RAG.
 
 V1 comprend MJ et joueurs, trois éditions, bibliothèque/incarnations, chroniques reconvergentes, fiches/cartes, journal, PDF/OCR, IA texte et images optionnelles, et exports téléchargeables.
 La mémoire est une extension optionnelle documentée ; son intégration reste conditionnée aux preuves de S4 et E03, sans date V1 engagée.
@@ -710,6 +731,10 @@ La validation humaine réduit des erreurs de contenu, mais ne prouve pas à elle
 | Désactivé / indisponible | Fonction non sélectionnée / fonction sélectionnée mais non utilisable ; aucun de ces états ne signifie données supprimées |
 
 ## 14. État de revue et métadonnées
+
+Mise à jour éditoriale v0.1.1 du 12 novembre : ajout du renvoi au PRD prioritaire
+et déclassement de la planification de septembre. Les comptes d'exigences ci-dessous
+et la revue P02 restent ceux du document large ; aucune nouvelle revue n'est revendiquée.
 
 Le livrable contient **30 FR-CORE, 90 AC-CORE, 15 NFR-CORE, 6 contraintes et 5 objectifs**, avec cinq parcours et onze entrées de preuve/approbation encore ouvertes.
 La rédaction de P01 est complète ; la [revue indépendante P02 du présent noyau](../../reviews/2026-09-28/merlain-prd-v0.1-review.md) est terminée : **PASS — SPEC DRAFT READY**, aucun constat matériel. Les cases historiques du plan ne sont pas modifiées ici.

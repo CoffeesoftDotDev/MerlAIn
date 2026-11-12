@@ -1,0 +1,66 @@
+{
+  "prdFile": ".copilot-tracking/squad/members/produit/prd/2026-11-12/merlain-rulebook-mvp-prd.md",
+  "lastAccessed": "2026-11-12",
+  "currentPhase": "integrate",
+  "status": "draft",
+  "authoringStatus": "complete",
+  "reviewStatus": "pending",
+  "approvalStatus": "not-approved",
+  "version": "0.2.1",
+  "phaseSkillsLoaded": [
+    "prd-author#assess",
+    "prd-author#discover",
+    "prd-author#create",
+    "prd-author#build",
+    "prd-author#integrate"
+  ],
+  "scopeAuthority": "Direct user requests and supplied conversation of 2026-11-12; first development milestone uses DevUI, PostgreSQL, MCP and Foundry before the application.",
+  "deliveryPriorities": [
+    {
+      "id": "P1",
+      "outcome": "Chat with a locally ingested PDF rulebook using Markdown H2/H3 sections, Microsoft Agent Framework and MCP."
+    },
+    {
+      "id": "P2",
+      "outcome": "Generate book-grounded characters, NPCs and monsters with qualified statistics, backstory and an actual image."
+    }
+  ],
+  "deferred": [
+    "Campaign-first milestone and complete multiplayer/accounts/OIDC workflows",
+    "Dapr as an integration prerequisite",
+    "Audio transcription, Graphiti, Storyteller and session memory",
+    "Interactive deepwiki and cross-source enrichment",
+    "Native VTT exports and general-purpose plugin infrastructure"
+  ],
+  "referencesProcessed": [
+    {
+      "file": ".copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-prd-v0.1.md",
+      "status": "retained-reference",
+      "keyFindings": "Broad requirements retained; September delivery priorities superseded for the first release, existing identifiers unchanged."
+    },
+    {
+      "file": ".copilot-tracking/squad/members/produit/prd/2026-09-28/merlain-session-memory-prd.md",
+      "status": "deferred",
+      "keyFindings": "Future post-episode memory extension; not one of the two delivery priorities."
+    }
+  ],
+  "identifierCounts": {
+    "fr": 12,
+    "ac": 36,
+    "nfr": 10,
+    "constraint": 6,
+    "goal": 2
+  },
+  "nextActions": [
+    "Implement the bounded DevUI-first milestone with Responses, local MCP retrieval and PostgreSQL conversation persistence; verify the Foundry deployment and authentication.",
+    "Review the proposed strict H2/H3 contract and verify Meilisearch/MCP interoperability; no September review applies to this revision.",
+    "Identify the authorized book/edition and statistical schemas, validate source metadata and headings on the actual PDF.",
+    "Verify local retrieval, tool-calling text model and image-provider contracts before implementation acceptance.",
+    "Reconcile the existing campaign-first issue batch only in a separately authorized tracker operation."
+  ],
+  "approval": {
+    "validateExit": false,
+    "finalizeExit": false,
+    "qualityReport": null
+  }
+}
