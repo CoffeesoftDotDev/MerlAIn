@@ -1,0 +1,237 @@
+openapi: 3.1.0
+info:
+  title: Local identity and session API candidate
+  version: 0.1.0-draft
+  description: |
+    Review draft only; not an accepted contract or an implemented API.
+    This covers local sign-in, session inspection, and sign-out. Account
+    registration, administrator bootstrap and recovery, OIDC sign-in and
+    linking, session storage, and local HTTPS configuration remain open.
+    All values in examples are synthetic.
+servers:
+  - url: /api/v1
+security:
+  - sessionCookie: []
+paths:
+  /sessions/local:
+    post:
+      operationId: createLocalSession
+      description: |
+        Authenticate with a case-insensitively unique username or a verified,
+        unique email and password. Ambiguous identifiers are rejected rather
+        than guessed. Invalid credentials, unknown accounts, and unverified
+        email login return the same safe error and create no session.
+        Throttle repeated attempts without revealing whether an account
+        exists; exact limits and any lockout policy require owner review.
+        Do not log passwords, session cookies, or CSRF tokens.
+
+        For this browser-facing proposal, require application/json and an
+        Origin exactly matching the configured public BFF origin. Do not allow
+        credentialed cross-origin requests from untrusted origins. Successful
+        sign-in rotates any prior session and sets an opaque HttpOnly, Secure,
+        SameSite cookie. The candidate SameSite value is Lax; OIDC callback
+        behavior and trusted-proxy origin handling require separate review.
+        No campaign membership or role is implied by authentication.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalCredentials'
+            example:
+              identifier: synthetic-user
+              password: synthetic-test-password
+      responses:
+        '200':
+          description: Authenticated session and session-bound CSRF token.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            Set-Cookie:
+              $ref: '#/components/headers/SessionCookie'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentSession'
+              example:
+                principalId: user-a
+                csrfToken: synthetic-csrf-token
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /sessions/current:
+    get:
+      operationId: getCurrentSession
+      description: |
+        Return the authenticated principal and a session-bound CSRF token to
+        the same-origin UI. The token is not an authentication credential and
+        must not be stored in browser script storage or logged. The opaque
+        session cookie remains inaccessible to browser scripts.
+      responses:
+        '200':
+          description: Current authenticated session.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentSession'
+              example:
+                principalId: user-a
+                csrfToken: synthetic-csrf-token
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    delete:
+      operationId: deleteCurrentSession
+      description: |
+        Validate the configured origin and session-bound CSRF token, revoke
+        the current server-side session, and expire the session cookie.
+        Report success only after server-side revocation succeeds. A failure
+        must not claim that the session was revoked.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '204':
+          description: Session revoked and cookie expired.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            Set-Cookie:
+              $ref: '#/components/headers/ExpiredCookie'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+components:
+  securitySchemes:
+    sessionCookie:
+      $ref: './campaign-api-v1.draft.yaml#/components/securitySchemes/sessionCookie'
+    csrfToken:
+      $ref: './campaign-api-v1.draft.yaml#/components/securitySchemes/csrfToken'
+  parameters:
+    Origin:
+      name: Origin
+      in: header
+      required: true
+      description: Must exactly match the configured public BFF origin.
+      schema:
+        type: string
+  headers:
+    NoStore:
+      required: true
+      description: Prevent session responses from being cached.
+      schema:
+        type: string
+        const: no-store
+    SessionCookie:
+      required: true
+      description: |
+        Opaque merlain_session cookie with HttpOnly, Secure, SameSite=Lax,
+        and Path=/api/v1. Cookie lifetime and server-side expiry must agree.
+        Exact lifetime and local HTTPS setup require owner review.
+      schema:
+        type: string
+    ExpiredCookie:
+      required: true
+      description: Expire the same cookie name and path used at sign-in.
+      schema:
+        type: string
+  responses:
+    InvalidInput:
+      description: Invalid request format; no session is created.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: './campaign-api-v1.draft.yaml#/components/schemas/ErrorEnvelope'
+    Unauthenticated:
+      description: |
+        Generic authentication failure; do not reveal whether an account or
+        email exists. No session is created for a failed sign-in.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: './campaign-api-v1.draft.yaml#/components/schemas/ErrorEnvelope'
+    Forbidden:
+      description: The request fails origin or CSRF validation.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: './campaign-api-v1.draft.yaml#/components/schemas/ErrorEnvelope'
+    RateLimited:
+      description: Authentication attempts are temporarily throttled.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+        Retry-After:
+          description: Retry guidance when it can be provided safely.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: './campaign-api-v1.draft.yaml#/components/schemas/ErrorEnvelope'
+    Unavailable:
+      description: |
+        A required authentication or session dependency is unavailable. Do not
+        create a fallback session or claim that sign-out succeeded.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: './campaign-api-v1.draft.yaml#/components/schemas/ErrorEnvelope'
+  schemas:
+    LocalCredentials:
+      type: object
+      additionalProperties: false
+      required: [identifier, password]
+      properties:
+        identifier:
+          type: string
+          minLength: 1
+          description: Username or verified, unique email.
+        password:
+          type: string
+          minLength: 1
+          writeOnly: true
+    CurrentSession:
+      type: object
+      additionalProperties: false
+      required: [principalId, csrfToken]
+      properties:
+        principalId:
+          type: string
+          minLength: 1
+          description: Opaque local account identifier, not a campaign role.
+        csrfToken:
+          type: string
+          minLength: 1
+          description: Session-bound token for unsafe same-origin requests.
