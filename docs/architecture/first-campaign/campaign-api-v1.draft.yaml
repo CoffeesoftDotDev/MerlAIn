@@ -1,0 +1,1016 @@
+openapi: 3.1.0
+info:
+  title: First-campaign API candidate
+  version: 0.1.0-draft
+  description: |
+    Review draft only; not an accepted contract or an implemented API.
+    Identity/session operational details, invitation reuse limits, remaining
+    membership and ownership transitions, Dapr addressing, and archive
+    restoration remain open. The cookie and CSRF schemes below are proposed
+    interface requirements, not evidence that authentication exists. Unsafe
+    requests also require an Origin matching the configured public BFF origin;
+    credentialed cross-origin access from untrusted origins is not allowed.
+servers:
+  - url: /api/v1
+security:
+  - sessionCookie: []
+paths:
+  /campaigns:
+    get:
+      operationId: listCampaigns
+      description: |
+        List campaigns in which the caller has current membership. Installation
+        administrator status alone grants no campaign membership. Revoked
+        memberships are excluded.
+      responses:
+        '200':
+          description: Campaign summaries accessible to the caller.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CampaignSummary'
+              example:
+                - campaignId: campaign-a
+                  name: campaign-example
+                  edition: edition-example
+                  state: active
+                  role: gm
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    post:
+      operationId: createCampaign
+      description: |
+        An authenticated platform user creates a campaign and becomes its
+        initial owner and GM. The server derives the creator from the session;
+        the request cannot choose an owner or role. No other campaign
+        membership or installation privilege is granted.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaign'
+            example:
+              name: campaign-example
+              edition: edition-example
+              narrativeDirection: narrative-example
+      responses:
+        '201':
+          description: Campaign and creator membership saved.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            Location:
+              description: Relative URL of the created campaign.
+              required: true
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedCampaign'
+              example:
+                campaignId: campaign-a
+                ownerId: user-a
+                membership:
+                  campaignId: campaign-a
+                  memberId: member-a
+                  role: gm
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+    get:
+      operationId: getCampaign
+      description: |
+        Return shared campaign metadata for a current member. Do not include
+        GM-private narrative direction or other private content in this
+        representation. Archived campaigns remain subject to the accepted
+        read-only and published-content boundaries.
+      responses:
+        '200':
+          description: Campaign summary for the current member.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignSummary'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/members/{memberId}:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - $ref: '#/components/parameters/MemberId'
+    get:
+      operationId: getMembership
+      description: |
+        A current campaign GM reads a current membership and its ETag for
+        role management. A membership identifier is not an authorization
+        claim. Undiscoverable objects return an opaque not-found response.
+      responses:
+        '200':
+          description: Current campaign membership.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+              example:
+                campaignId: campaign-a
+                memberId: member-b
+                role: player
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    patch:
+      operationId: promotePlayer
+      description: |
+        A current campaign GM may promote a current Player to GM. The actor
+        is derived from the session and checked against current membership.
+        Ownership and roles in other campaigns do not change. Other role
+        transitions are not defined by this draft.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+            example:
+              role: gm
+      responses:
+        '200':
+          description: Updated campaign membership.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Membership'
+              example:
+                campaignId: campaign-a
+                memberId: member-b
+                role: gm
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/StaleRevision'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    delete:
+      operationId: revokeMembership
+      description: |
+        A current campaign GM may revoke a campaign membership. Requests
+        already in progress may finish; later campaign requests from the
+        revoked member are denied even with an existing session or link.
+        Revocation does not revoke the user's installation-wide session or
+        delete campaign data. If the last GM leaves or loses GM status before
+        a successor accepts, archive the campaign as part of the same
+        successful transition; remaining Players retain read-only access to
+        content already published to them. Owner departure with other GMs
+        still present requires further contract review.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '204':
+          description: Membership revoked.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '412':
+          $ref: '#/components/responses/StaleRevision'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/invitations:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+    post:
+      operationId: createInvitation
+      description: |
+        A current campaign GM creates a transferable invitation. The server
+        sets expiry to seven days after creation. The candidate redemption URL
+        uses a fragment so the bearer token is not sent in the initial page
+        request. The token must contain at least 256 bits of cryptographic
+        randomness. Do not log, trace, or retain its plaintext on the server
+        after issuance. The number of permitted redemptions per link remains
+        a policy review item.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '201':
+          description: Invitation created; the redemption URL is sensitive.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedInvitation'
+              example:
+                invitationId: invitation-a
+                redeemUrl: /invitations/redeem#token=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                expiresAt: '2026-11-20T11:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /invitations/redeem:
+    post:
+      operationId: redeemInvitation
+      description: |
+        An authenticated, eligible account redeems a valid transferable
+        invitation and becomes a Player in that campaign. Whether a
+        previously revoked account may rejoin using an existing link remains
+        a policy decision. The UI sends the token in the
+        request body, removes it from the visible URL after extraction, and
+        must not log or trace it or expose it to third-party scripts. Invalid,
+        expired, or otherwise unavailable invitations use the same opaque
+        not-found response. Concurrent redemptions must honor the eventual
+        approved reuse policy atomically.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedeemInvitation'
+            example:
+              token: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      responses:
+        '200':
+          description: Invitation accepted and Player membership granted.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedeemedMembership'
+              example:
+                campaignId: campaign-a
+                memberId: member-b
+                role: player
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/ideas:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+    post:
+      operationId: createPrivateIdea
+      description: |
+        A current campaign GM saves a private idea. It is not published by
+        reference from a scene.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdeaInput'
+            example:
+              text: private-fixture-marker
+      responses:
+        '201':
+          description: Private idea saved.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateIdea'
+              example:
+                campaignId: campaign-a
+                ideaId: idea-a
+                text: private-fixture-marker
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/ideas/{ideaId}:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - $ref: '#/components/parameters/IdeaId'
+    get:
+      operationId: getPrivateIdea
+      description: |
+        Only a current GM in the campaign may read the private idea. A Player
+        or non-member receives an opaque not-found response.
+      responses:
+        '200':
+          description: Private idea for an authorized GM.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateIdea'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    put:
+      operationId: updatePrivateIdea
+      description: |
+        A current campaign GM replaces the idea using its current ETag.
+        If a relevant source or right changes, suspend any affected published
+        projection until GM review.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdeaInput'
+      responses:
+        '200':
+          description: Updated private idea and its new ETag.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivateIdea'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/StaleRevision'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/scenes:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+    post:
+      operationId: createSceneDraft
+      description: A current campaign GM creates a private scene draft.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SceneInput'
+            example:
+              title: scene-example
+              body: synthetic-scene-content
+      responses:
+        '201':
+          description: Private scene draft saved.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SceneDraft'
+              example:
+                campaignId: campaign-a
+                sceneId: scene-a
+                title: scene-example
+                body: synthetic-scene-content
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/scenes/{sceneId}/draft:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - $ref: '#/components/parameters/SceneId'
+    get:
+      operationId: getSceneDraft
+      description: Only a current campaign GM may read the draft.
+      responses:
+        '200':
+          description: Private draft and its current ETag.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SceneDraft'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    put:
+      operationId: updateSceneDraft
+      description: |
+        A current campaign GM replaces the draft using its current ETag.
+        Editing a draft does not change the current published projection.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SceneInput'
+      responses:
+        '200':
+          description: Updated draft and its new ETag.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SceneDraft'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '412':
+          $ref: '#/components/responses/StaleRevision'
+        '428':
+          $ref: '#/components/responses/PreconditionRequired'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/scenes/{sceneId}/publications:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - $ref: '#/components/parameters/SceneId'
+    post:
+      operationId: publishScene
+      description: |
+        A current campaign GM explicitly publishes the draft version named
+        by draftEtag to a snapshot of selected current Players. A stale
+        draftEtag returns a conflict without publishing. Reject a selected
+        member who is not a current Player rather than silently changing
+        the audience. Resolve all-current-players at publication time; later
+        members are not added automatically. The operation must not expose
+        private ideas, draft-only content, or private sources. A later edit
+        requires explicit republishing.
+      security:
+        - sessionCookie: []
+          csrfToken: []
+      parameters:
+        - $ref: '#/components/parameters/Origin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublicationInput'
+            example:
+              draftEtag: '"draft-revision-1"'
+              audience:
+                mode: selected
+                memberIds:
+                  - member-b
+      responses:
+        '201':
+          description: Scene version and audience snapshot published.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicationReceipt'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /campaigns/{campaignId}/scenes/{sceneId}/publication:
+    parameters:
+      - $ref: '#/components/parameters/CampaignId'
+      - $ref: '#/components/parameters/SceneId'
+    get:
+      operationId: getPublishedScene
+      description: |
+        Return only the current published projection for a current Player
+        in its publication-time audience. Revocation is checked for every
+        request. Suspend affected projections after a relevant source or
+        right changes, or suspected disclosure, until GM review. An
+        inaccessible or suspended projection is not discoverable. GM access
+        to a published projection remains a review item.
+      responses:
+        '200':
+          description: Audience-authorized published projection.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishedScene'
+              example:
+                sceneId: scene-a
+                publicationId: publication-a
+                title: scene-example
+                body: synthetic-published-content
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: merlain_session
+      description: |
+        Candidate opaque HttpOnly, Secure, SameSite session cookie. Session
+        issuance, storage, expiry, and revocation require identity-owner review.
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: |
+        Candidate session-bound CSRF token for unsafe requests. Issuance,
+        binding, validation, and local HTTPS behavior remain review items.
+  parameters:
+    CampaignId:
+      name: campaignId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    MemberId:
+      name: memberId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    IdeaId:
+      name: ideaId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SceneId:
+      name: sceneId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      description: Current strong ETag of the membership or draft being changed.
+      schema:
+        type: string
+    Origin:
+      name: Origin
+      in: header
+      required: true
+      description: Must exactly match the configured public BFF origin.
+      schema:
+        type: string
+  headers:
+    ETag:
+      description: Strong ETag for the returned resource revision.
+      required: true
+      schema:
+        type: string
+        example: '"revision-example"'
+    NoStore:
+      required: true
+      description: Prevent sensitive response content from being cached.
+      schema:
+        type: string
+        const: no-store
+  responses:
+    InvalidInput:
+      description: Invalid request fields; no successful write is reported.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unauthenticated:
+      description: Session is absent or expired.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Forbidden:
+      description: A known campaign member lacks authority for the action.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: Object is absent or not discoverable to the caller.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Conflict:
+      description: The requested transition conflicts with current state.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    StaleRevision:
+      description: The supplied ETag is stale; no update is accepted.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    PreconditionRequired:
+      description: An update or publication omitted the required ETag.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unavailable:
+      description: |
+        A required dependency is unavailable. Do not report a successful save
+        or imply a retry is safe when the outcome is uncertain.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    CreateCampaign:
+      type: object
+      additionalProperties: false
+      required: [name, edition, narrativeDirection]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        edition:
+          type: string
+          minLength: 1
+        narrativeDirection:
+          type: string
+          minLength: 1
+    CreatedCampaign:
+      type: object
+      additionalProperties: false
+      required: [campaignId, ownerId, membership]
+      description: The membership campaignId must equal the created campaignId.
+      properties:
+        campaignId:
+          type: string
+        ownerId:
+          type: string
+        membership:
+          $ref: '#/components/schemas/Membership'
+    CampaignSummary:
+      type: object
+      additionalProperties: false
+      required: [campaignId, name, edition, state, role]
+      properties:
+        campaignId:
+          type: string
+        name:
+          type: string
+        edition:
+          type: string
+        state:
+          type: string
+          enum: [active, archived]
+        role:
+          type: string
+          enum: [gm, player]
+    Membership:
+      type: object
+      additionalProperties: false
+      required: [campaignId, memberId, role]
+      properties:
+        campaignId:
+          type: string
+        memberId:
+          type: string
+        role:
+          type: string
+          enum: [gm, player]
+    RedeemedMembership:
+      allOf:
+        - $ref: '#/components/schemas/Membership'
+        - type: object
+          properties:
+            role:
+              const: player
+    Promotion:
+      type: object
+      additionalProperties: false
+      required: [role]
+      properties:
+        role:
+          const: gm
+    CreatedInvitation:
+      type: object
+      additionalProperties: false
+      required: [invitationId, redeemUrl, expiresAt]
+      properties:
+        invitationId:
+          type: string
+        redeemUrl:
+          type: string
+          description: Sensitive relative UI URL containing a token in its fragment.
+          pattern: '^/invitations/redeem#token=[A-Za-z0-9_-]{43,}$'
+        expiresAt:
+          type: string
+          format: date-time
+    RedeemInvitation:
+      type: object
+      additionalProperties: false
+      required: [token]
+      properties:
+        token:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{43,}$'
+          writeOnly: true
+    IdeaInput:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text:
+          type: string
+          minLength: 1
+    PrivateIdea:
+      type: object
+      additionalProperties: false
+      required: [campaignId, ideaId, text]
+      properties:
+        campaignId:
+          type: string
+        ideaId:
+          type: string
+        text:
+          type: string
+    SceneInput:
+      type: object
+      additionalProperties: false
+      required: [title, body]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+          minLength: 1
+    SceneDraft:
+      type: object
+      additionalProperties: false
+      required: [campaignId, sceneId, title, body]
+      properties:
+        campaignId:
+          type: string
+        sceneId:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+    PublicationInput:
+      type: object
+      additionalProperties: false
+      required: [draftEtag, audience]
+      properties:
+        draftEtag:
+          type: string
+          minLength: 1
+          description: Strong ETag of the draft version to publish.
+        audience:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required: [mode, memberIds]
+              properties:
+                mode:
+                  const: selected
+                memberIds:
+                  type: array
+                  uniqueItems: true
+                  items:
+                    type: string
+            - type: object
+              additionalProperties: false
+              required: [mode]
+              properties:
+                mode:
+                  const: all-current-players
+    PublicationReceipt:
+      type: object
+      additionalProperties: false
+      required: [sceneId, publicationId]
+      properties:
+        sceneId:
+          type: string
+        publicationId:
+          type: string
+    PublishedScene:
+      type: object
+      additionalProperties: false
+      required: [sceneId, publicationId, title, body]
+      properties:
+        sceneId:
+          type: string
+        publicationId:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      required: [error]
+      example:
+        error:
+          code: revision_conflict
+          message: The resource changed. Refresh and try again.
+          requestId: request-example
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message, requestId]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            requestId:
+              type: string
